@@ -6,9 +6,9 @@ const openpgp = require('openpgp'); // use as CommonJS, AMD, ES6 module or via w
  openpgp.config.compression = openpgp.enums.compression.zlib
 
 var options = {
- userIds: [{ name: 'test', email: 'test@example.com' }],
+  userIds: [{ name: 'prototermserver', email: 'admin@abas.service' }],
   numBits: 2048,
-  passphrase: 'secretut'
+  passphrase: 'who are you'
 };
 
 var publicKey;
@@ -20,5 +20,9 @@ openpgp.generateKey(options).then(key => {
   console.log('Key generated');
   console.log(privateKey);
   console.log(publicKey);
+const fs = require('fs');
+fs.appendFileSync("./public.key", publicKey.toString());
+fs.appendFileSync("./privat.key", privateKey.toString());
+
 });
 

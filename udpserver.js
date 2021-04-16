@@ -60,7 +60,8 @@ connection.connect(function(err){
       if (!err) pribors=sqlresults;
       if (pribors) {
         consolelog(' import table pribors ok. objects:'+pribors.length);
-        pribors.forEach(obj => {console.log(obj.id,obj.serial)})
+        var n=0;
+        pribors.forEach(obj => {console.log(++n,obj.id,obj.serial,obj.vpnip)})
       }
       else consolelog('import pribors failed');
     });
