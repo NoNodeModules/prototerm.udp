@@ -1,7 +1,7 @@
 /// UDP server 4    //////////////////////
 /// techinfo@lora-wan.net
 
-const version=210416.1;
+const version=210417.1;
 const debug=1;
 console.log('Version:',version,'Level of debug:',debug);
 
@@ -9,7 +9,7 @@ console.log('Version:',version,'Level of debug:',debug);
 
 const SERVERPORT = 9090; //UDP port for our server
 //const SERVERHOST='185.255.135.85'; // (abas.services)
-const SERVERHOST='0.0.0.0'; // (abas.services)
+const SERVERHOST='10.8.0.1'; // (abas.services)
 
 const WSPORT=2876;
 
@@ -17,7 +17,7 @@ const WSPORT=2876;
 var dt=new Date();
 ///////////////////////////////////////////
 const fs = require('fs');
-const io = require('socket.io').listen(WSPORT); 
+//const io = require('socket.io').listen(WSPORT); 
 const dgram = require('dgram');
 const server = dgram.createSocket('udp4');
 const mysql = require('mysql2');
@@ -76,7 +76,7 @@ function hexdump(msg){  //return string in
   }
   return tmpstr+']';
 }
-
+/*
 //////////////////////////!!! websocket !!! ////////////////////
 io.sockets.on('connection', function (socket) {
   var handshake = socket.handshake;
@@ -103,6 +103,7 @@ io.sockets.on('connection', function (socket) {
   });
 ///////////////////////////////////////////////////
 }) //end of socket.on
+*/
 
 //////////////////////////!!!  udp  !!!/////////////////////////
 connection.connect(function(err){
@@ -133,16 +134,18 @@ server.on('message', function (message, remote) {
 //находим его открытый ключь отправителя
 //открываем его ключем
 //получаем что-то вроде \0x7e\.\.\.\.\.\0x7f
-
-  var id=pribors.filter(obj => obj.vpnip==remote.address)[0].id;
-
+  
+  validcode=0;  
   var msg=message;
-  validcode=0;
   if (msg[0]==0x7e && msg[msg.length-1]==0x7f ) validcode=1;
-  if (!id) validcode=-1
+
+  var id=pribors.filter(obj => obj.vpnip==remote.address)[0];
+  if (id) id=id.id;
+ 
+ else validcode=-1;
  
   if (validcode>0) {
-dt=new Date();
+    dt=new Date();
     var cmd=message[1]
     if (cmd==2) dooropen(id);
     else if (cmd==3) doorclose(id);
@@ -164,7 +167,7 @@ dt=new Date();
   var packetResponse=new Buffer.from('it`s not for you'); //16 Byte
   packetResponse[0]=0x7e;
   packetResponse[15]=0x7f;
-  if (validcode){
+  if (validcode>0){
     packetResponse[1]=0; // signal oK
     packetResponse[2]=0; // signal oK
     packetResponse[3]=0; // signal oK
@@ -184,8 +187,7 @@ dt=new Date();
 */
   
 function dooropen(id){
-  consolelog(" "+id+" dooropen");
-dtstr=dt.toString.
+  console.log(" "+id+" dooropen");
   sqlq="insert into doorstatus (prid,changestatu) values('"+id+"',1);"
   console.log(' #',sqlq);
   connection.execute(sqlq, function(err, sqlresults, fields) {
@@ -194,8 +196,8 @@ dtstr=dt.toString.
 }
 function doorclose(id){
   console.log(" "+id+" doorclose");
-  sqlq="insert into doorstatus (prid,changestatu) values('"+id+"',0;"
-  consolelog(' #',sqlq);
+  sqlq="insert into doorstatus (prid,changestatu) values('"+id+"',0);"
+  console.log(' #',sqlq);
   connection.execute(sqlq, function(err, sqlresults, fields) {
     if (err) console.log(err.message);
   });

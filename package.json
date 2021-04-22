@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "mysql2": "^2.2.5",
+    "openpgp": "*",
+    "socket.io": "^4.0.1",
+    "websocket": "^1.0.34"
+  }
+}
